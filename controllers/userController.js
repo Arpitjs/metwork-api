@@ -19,7 +19,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
     })
 })
 
-exports.updateUser = catchAsync(async(req, res, next) => {
+exports.updateUser = catchAsync(async (req, res, next) => {
     let updated = await User.findByIdAndUpdate(req.params.id, req.body, { runValidators: true, new: true })
     res.status(200).json({
         status: 'sucess',
@@ -27,7 +27,18 @@ exports.updateUser = catchAsync(async(req, res, next) => {
     })
 })
 
-exports.deleteUser = catchAsync(async(req, res, next) => {
+exports.deleteUser = catchAsync(async (req, res, next) => {
     await User.findByIdAndDelete(req.params.id)
     res.status(204).json(null)
 })
+
+exports.checkUsername = async (req, res, next) => {
+    User.findOne({ name: req.params.name })
+        .then(user => {
+            if (!user) {
+                return next({ error: 'no such user', status: 404 })
+            }
+            res.status(200).json(user)
+        })
+        .catch(e => next(e))
+}
